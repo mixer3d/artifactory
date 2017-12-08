@@ -27,7 +27,7 @@ RUN set -x \
 && rm -rf ${PACKAGE} logs \
 && mkdir -p ${ARTIFACTORY_DATA} \
 && mv ${ARTIFACTORY_HOME}/etc ${ARTIFACTORY_HOME}/etc-clean \
-&& mkdir -p ${ARTIFACTORY_DATA}/access ${ARTIFACTORY_DATA}/backup ${ARTIFACTORY_DATA}/data ${ARTIFACTORY_DATA}/logs ${ARTIFACTORY_DATA}/run /${ARTIFACTORY_DATA}/etc \
+&& mkdir -p ${ARTIFACTORY_DATA}/access ${ARTIFACTORY_DATA}/backup ${ARTIFACTORY_DATA}/data ${ARTIFACTORY_DATA}/logs ${ARTIFACTORY_DATA}/run ${ARTIFACTORY_DATA}/etc \
 && ln -s ${ARTIFACTORY_DATA}/access ${ARTIFACTORY_HOME}/access \
 && ln -s ${ARTIFACTORY_DATA}/backup ${ARTIFACTORY_HOME}/backup \
 && ln -s ${ARTIFACTORY_DATA}/data ${ARTIFACTORY_HOME}/data \
