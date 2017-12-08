@@ -23,6 +23,7 @@ RUN set -x \
 && mv artifactory-pro-${ARTIFACTORY_VERSION} ${ARTIFACTORY_HOME} \
 && find $ARTIFACTORY_HOME -type f -name "*.exe" -o -name "*.bat" | xargs /bin/rm \
 && rm -rf ${PACKAGE} logs \
+&& mkdir -p ${ARTIFACTORY_DATA} \
 && ln -s ${ARTIFACTORY_DATA}/access ${ARTIFACTORY_HOME}/access \
 && ln -s ${ARTIFACTORY_DATA}/backup ${ARTIFACTORY_HOME}/backup \
 && ln -s ${ARTIFACTORY_DATA}/data ${ARTIFACTORY_HOME}/data \
@@ -31,7 +32,11 @@ RUN set -x \
 && mv ${ARTIFACTORY_HOME}/etc ${ARTIFACTORY_HOME}/etc-clean \
 && ln -s ${ARTIFACTORY_DATA}/etc ${ARTIFACTORY_HOME}/etc \
 && sed -i 's/-n "\$ARTIFACTORY_PID"/-d $(dirname "$ARTIFACTORY_PID")/' $ARTIFACTORY_HOME/bin/artifactory.sh \
-&& echo 'if [ ! -z "${EXTRA_JAVA_OPTIONS}" ]; then export JAVA_OPTIONS="$JAVA_OPTIONS $EXTRA_JAVA_OPTIONS"; fi' >> $ARTIFACTORY_HOME/bin/artifactory.deft
+&& echo 'if [ ! -z "${EXTRA_JAVA_OPTIONS}" ]; then export JAVA_OPTIONS="$JAVA_OPTIONS $EXTRA_JAVA_OPTIONS"; fi' >> $ARTIFACTORY_HOME/bin/artifactory.default \
+&& POSTGRESQL_JAR=postgresql-42.1.4.jar \
+&& curl -fsSL \
+"https://jdbc.postgresql.org/download/${POSTGRESQL_JAR}" \
+-o $ARTIFACTORY_HOME/tomcat/lib/${POSTGRESQL_JAR}
 
 # Install netstat for artifactoryctl to work properly
 # FIXME: needed?
@@ -42,6 +47,8 @@ COPY entrypoint.sh /
 # Drop privileges
 RUN chown -R ${ARTIFACTORY_USER_ID}:${ARTIFACTORY_USER_ID} ${ARTIFACTORY_HOME} \
 && chmod -R 777 ${ARTIFACTORY_HOME} \
+&& chown -R ${ARTIFACTORY_USER_ID}:${ARTIFACTORY_USER_ID} ${ARTIFACTORY_DATA} \
+&& chmod -R 777 ${ARTIFACTORY_DATA} \
 && chown -R ${ARTIFACTORY_USER_ID}:${ARTIFACTORY_USER_ID} /entrypoint.sh \
 && chmod -R 777 /entrypoint.sh
 
