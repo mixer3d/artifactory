@@ -2,8 +2,6 @@
 #
 # An entrypoint script for Artifactory to allow custom setup before server starts
 #
-set -x
-
 ART_ETC=$ARTIFACTORY_DATA/etc
 
 : ${RECOMMENDED_MAX_OPEN_FILES:=32000}

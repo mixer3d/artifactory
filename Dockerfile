@@ -12,6 +12,8 @@ DB_USER=artifactory \
 DB_PASSWORD=artifactory-pass \
 DB_NAME=artifactory
 
+ENV TOMCAT_HOME=${ARTIFACTORY_HOME}/tomcat
+
 RUN set -x \
 && mkdir -p /var/opt  \
 && cd /var/opt \
