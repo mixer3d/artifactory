@@ -5,7 +5,6 @@ MAINTAINER stpork from Mordor team
 ENV ARTIFACTORY_VERSION=5.6.2 \
 ARTIFACTORY_HOME=/var/opt/artifactory \
 ARTIFACTORY_DATA=/data/artifactory \
-ARTIFACTORY_USER_ID=1001 \
 DB_HOST=postgresql \
 DB_PORT=5432 \
 DB_USER=artifactory \
@@ -40,7 +39,11 @@ RUN set -x \
 && POSTGRESQL_JAR=postgresql-42.1.4.jar \
 && curl -fsSL \
 "https://jdbc.postgresql.org/download/${POSTGRESQL_JAR}" \
--o $ARTIFACTORY_HOME/tomcat/lib/${POSTGRESQL_JAR}
+-o $ARTIFACTORY_HOME/tomcat/lib/${POSTGRESQL_JAR} \
+&& chown -R 1001:0 ${ARTIFACTORY_HOME} \
+&& chmod -R 777 ${ARTIFACTORY_HOME} \
+&& chown -R 1001:0 ${ARTIFACTORY_DATA} \
+&& chmod -R 777 ${ARTIFACTORY_DATA}
 
 # Install netstat for artifactoryctl to work properly
 # FIXME: needed?
@@ -49,14 +52,10 @@ RUN set -x \
 COPY entrypoint.sh /
 
 # Drop privileges
-RUN chown -R ${ARTIFACTORY_USER_ID}:${ARTIFACTORY_USER_ID} ${ARTIFACTORY_HOME} \
-&& chmod -R 777 ${ARTIFACTORY_HOME} \
-&& chown -R ${ARTIFACTORY_USER_ID}:${ARTIFACTORY_USER_ID} ${ARTIFACTORY_DATA} \
-&& chmod -R 777 ${ARTIFACTORY_DATA} \
-&& chown -R ${ARTIFACTORY_USER_ID}:${ARTIFACTORY_USER_ID} /entrypoint.sh \
-&& chmod -R 777 /entrypoint.sh
+RUN chown -R 1001:0 /entrypoint.sh \
+&& chmod -R 755 /entrypoint.sh
 
-USER $ARTIFACTORY_USER_ID
+USER 1001
 
 HEALTHCHECK --interval=5m --timeout=3s \
   CMD curl -f http://localhost:8080/artifactory || exit 1
