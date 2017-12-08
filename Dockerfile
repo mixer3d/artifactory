@@ -5,7 +5,7 @@ MAINTAINER stpork from Mordor team
 ENV ARTIFACTORY_VERSION=5.6.2 \
 ARTIFACTORY_HOME=/var/opt/artifactory \
 ARTIFACTORY_DATA=/data/artifactory \
-ARTIFACTORY_USER_ID=1030 \
+ARTIFACTORY_USER_ID=1001 \
 DB_HOST=postgresql \
 DB_PORT=5432 \
 DB_USER=artifactory \
@@ -31,6 +31,8 @@ RUN set -x \
 && ln -s ${ARTIFACTORY_DATA}/logs ${ARTIFACTORY_HOME}/logs \
 && ln -s ${ARTIFACTORY_DATA}/run ${ARTIFACTORY_HOME}/run \
 && ln -s ${ARTIFACTORY_DATA}/etc ${ARTIFACTORY_HOME}/etc \
+&& mv ${ARTIFACTORY_HOME}/etc-clean/* ${ARTIFACTORY_DATA}/etc \
+&& rm -rf ${ARTIFACTORY_HOME}/etc-clean \
 && sed -i 's/-n "\$ARTIFACTORY_PID"/-d $(dirname "$ARTIFACTORY_PID")/' $ARTIFACTORY_HOME/bin/artifactory.sh \
 && echo 'if [ ! -z "${EXTRA_JAVA_OPTIONS}" ]; then export JAVA_OPTIONS="$JAVA_OPTIONS $EXTRA_JAVA_OPTIONS"; fi' >> $ARTIFACTORY_HOME/bin/artifactory.default \
 && POSTGRESQL_JAR=postgresql-42.1.4.jar \
