@@ -25,7 +25,7 @@ RUN set -x \
 && find $ARTIFACTORY_HOME -type f -name "*.exe" -o -name "*.bat" | xargs /bin/rm \
 && rm -rf ${PACKAGE} logs \
 && mkdir -p ${ARTIFACTORY_DATA} \
-&& mv ${ARTIFACTORY_HOME}/etc ${ARTIFACTORY_HOME}/etc-clean \
+&& mv ${ARTIFACTORY_HOME}/etc ${ARTIFACTORY_DATA}/etc \
 && mkdir -p ${ARTIFACTORY_DATA}/access ${ARTIFACTORY_DATA}/backup ${ARTIFACTORY_DATA}/data ${ARTIFACTORY_DATA}/logs ${ARTIFACTORY_DATA}/run ${ARTIFACTORY_DATA}/etc \
 && ln -s ${ARTIFACTORY_DATA}/access ${ARTIFACTORY_HOME}/access \
 && ln -s ${ARTIFACTORY_DATA}/backup ${ARTIFACTORY_HOME}/backup \
@@ -33,7 +33,6 @@ RUN set -x \
 && ln -s ${ARTIFACTORY_DATA}/logs ${ARTIFACTORY_HOME}/logs \
 && ln -s ${ARTIFACTORY_DATA}/run ${ARTIFACTORY_HOME}/run \
 && ln -s ${ARTIFACTORY_DATA}/etc ${ARTIFACTORY_HOME}/etc \
-&& cp -R ${ARTIFACTORY_HOME}/etc-clean/* ${ARTIFACTORY_DATA}/etc \
 && sed -i 's/-n "\$ARTIFACTORY_PID"/-d $(dirname "$ARTIFACTORY_PID")/' $ARTIFACTORY_HOME/bin/artifactory.sh \
 && echo 'if [ ! -z "${EXTRA_JAVA_OPTIONS}" ]; then export JAVA_OPTIONS="$JAVA_OPTIONS $EXTRA_JAVA_OPTIONS"; fi' >> $ARTIFACTORY_HOME/bin/artifactory.default \
 && POSTGRESQL_JAR=postgresql-42.1.4.jar \
