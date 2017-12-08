@@ -68,6 +68,19 @@ checkMounts () {
     fi
 }
 
+# In case data dirs are missing or not mounted, need to create them
+setupDataDirs () {
+    logger "Setting up data directories if missing"
+    if [ ! -d ${ARTIFACTORY_DATA}/etc ]; then
+        mkdir -p || errorExit "Failed creating $ARTIFACTORY_DATA/etc" 
+        cp -R ${ARTIFACTORY_HOME}/etc-clean/* ${ARTIFACTORY_DATA}/etc 
+    fi
+    [ -d ${ARTIFACTORY_DATA}/data ]   || mkdir -p ${ARTIFACTORY_DATA}/data   || errorExit "Failed creating $ARTIFACTORY_DATA/data"
+    [ -d ${ARTIFACTORY_DATA}/logs ]   || mkdir -p ${ARTIFACTORY_DATA}/logs   || errorExit "Failed creating $ARTIFACTORY_DATA/logs"
+    [ -d ${ARTIFACTORY_DATA}/backup ] || mkdir -p ${ARTIFACTORY_DATA}/backup || errorExit "Failed creating $ARTIFACTORY_DATA/backup"
+    [ -d ${ARTIFACTORY_DATA}/access ] || mkdir -p ${ARTIFACTORY_DATA}/access || errorExit "Failed creating $ARTIFACTORY_DATA/access"
+}
+
 # Wait for DB port to be accessible
 waitForDB () {
     local PROPS_FILE=$1
@@ -215,6 +228,7 @@ start() {
     exec $TOMCAT_HOME/bin/catalina.sh "$@"
   fi
 }
+
 createLogsLink() {
     mkdir -p $ARTIFACTORY_HOME/logs/catalina || errorArtHome "Could not create dir $ARTIFACTORY_HOME/logs/catalina"
     if [ ! -L "$TOMCAT_HOME/logs" ];
@@ -231,6 +245,7 @@ echo "====================================="
 
 checkULimits
 checkMounts
+setupDataDirs
 setDBType
 checkLockFile
 setJvmHeapSize
