@@ -12,14 +12,17 @@ DB_USER=artifactory \
 DB_PASSWORD=artifactory-pass \
 DB_NAME=artifactory
 
-RUN  ARTIFACTORY_TEMP=$(mktemp -t "$(basename $0).XXXXXXXXXX.zip") \
+RUN set -x \
+&& mkdir -p /var/opt  \
+&& cd /var/opt \
+&& PACKAGE=jfrog-artifactory-pro-${ARTIFACTORY_VERSION}.zip \
 && curl -fsSL \
-"https://bintray.com/jfrog/artifactory-pro/download_file?file_path=org/artifactory/pro/jfrog-artifactory-pro/${ARTIFACTORY_VERSION}/jfrog-artifactory-pro-${ARTIFACTORY_VERSION}.zip" \
--o ${ARTIFACTORY_TEMP} \
-&& unzip -q $ARTIFACTORY_TEMP -d /tmp \
-&& mv /tmp/artifactory-pro-${ARTIFACTORY_VERSION} ${ARTIFACTORY_HOME} \
+"https://bintray.com/jfrog/artifactory-pro/download_file?file_path=org/artifactory/pro/jfrog-artifactory-pro/${ARTIFACTORY_VERSION}/${PACKAGE}" \
+-o ${PACKAGE} \
+&& unzip -q ${PACKAGE} \
+&& mv artifactory-pro-${ARTIFACTORY_VERSION} ${ARTIFACTORY_HOME} \
 && find $ARTIFACTORY_HOME -type f -name "*.exe" -o -name "*.bat" | xargs /bin/rm \
-&& rm -r $ARTIFACTORY_TEMP ${ARTIFACTORY_HOME}/logs \
+&& rm -rf ${PACKAGE} logs \
 && ln -s ${ARTIFACTORY_DATA}/access ${ARTIFACTORY_HOME}/access \
 && ln -s ${ARTIFACTORY_DATA}/backup ${ARTIFACTORY_HOME}/backup \
 && ln -s ${ARTIFACTORY_DATA}/data ${ARTIFACTORY_HOME}/data \
