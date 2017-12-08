@@ -44,11 +44,7 @@ RUN set -x \
 && chown -R 1001:0 ${ARTIFACTORY_DATA} \
 && chmod -R 777 ${ARTIFACTORY_DATA}
 
-# Install netstat for artifactoryctl to work properly
-# FIXME: needed?
-#RUN apt-get update && apt-get install -y net-tools
-
-COPY entrypoint.sh /
+COPY entrypoint.sh /entrypoint.sh
 
 # Drop privileges
 RUN chown -R 1001:0 /entrypoint.sh \
