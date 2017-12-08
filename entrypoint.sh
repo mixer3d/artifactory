@@ -2,6 +2,7 @@
 #
 # An entrypoint script for Artifactory to allow custom setup before server starts
 #
+set -x
 
 ART_ETC=$ARTIFACTORY_DATA/etc
 
@@ -116,11 +117,10 @@ setDBType () {
 	NEED_COPY=false
 	DB_PROPS=${ART_ETC}/db.properties
 
-	if ! ls $ARTIFACTORY_HOME/tomcat/lib/postgresql-*.jar 1> /dev/null 2>&1; then
-		errorExit "No postgresql connector found"
-	fi
+#	if ! ls $ARTIFACTORY_HOME/tomcat/lib/postgresql-*.jar 1> /dev/null 2>&1; then
+#		errorExit "No postgresql connector found"
+#	fi
 	setDBConf
-
 
 	# Wait for DB
 	# On slow systems, when working with docker-compose, the DB container might be up,
