@@ -23,15 +23,14 @@ RUN set -x \
 && unzip -q ${PACKAGE} \
 && mv artifactory-pro-${ARTIFACTORY_VERSION} ${ARTIFACTORY_HOME} \
 && find $ARTIFACTORY_HOME -type f -name "*.exe" -o -name "*.bat" | xargs /bin/rm \
-&& rm -rf ${PACKAGE} logs \
+&& rm -rf ${PACKAGE} ${ARTIFACTORY_HOME}/logs \
 && mkdir -p ${ARTIFACTORY_DATA} \
-&& mv ${ARTIFACTORY_HOME}/etc ${ARTIFACTORY_DATA}/etc \
-&& mkdir -p ${ARTIFACTORY_DATA}/access ${ARTIFACTORY_DATA}/backup ${ARTIFACTORY_DATA}/data ${ARTIFACTORY_DATA}/logs ${ARTIFACTORY_DATA}/run ${ARTIFACTORY_DATA}/etc \
 && ln -s ${ARTIFACTORY_DATA}/access ${ARTIFACTORY_HOME}/access \
 && ln -s ${ARTIFACTORY_DATA}/backup ${ARTIFACTORY_HOME}/backup \
 && ln -s ${ARTIFACTORY_DATA}/data ${ARTIFACTORY_HOME}/data \
 && ln -s ${ARTIFACTORY_DATA}/logs ${ARTIFACTORY_HOME}/logs \
 && ln -s ${ARTIFACTORY_DATA}/run ${ARTIFACTORY_HOME}/run \
+&& mv ${ARTIFACTORY_HOME}/etc ${ARTIFACTORY_HOME}/etc-clean \
 && ln -s ${ARTIFACTORY_DATA}/etc ${ARTIFACTORY_HOME}/etc \
 && sed -i 's/-n "\$ARTIFACTORY_PID"/-d $(dirname "$ARTIFACTORY_PID")/' $ARTIFACTORY_HOME/bin/artifactory.sh \
 && echo 'if [ ! -z "${EXTRA_JAVA_OPTIONS}" ]; then export JAVA_OPTIONS="$JAVA_OPTIONS $EXTRA_JAVA_OPTIONS"; fi' >> $ARTIFACTORY_HOME/bin/artifactory.default \
@@ -56,7 +55,7 @@ HEALTHCHECK --interval=5m --timeout=3s \
   CMD curl -f http://localhost:8080/artifactory || exit 1
 
 # Expose Artifactories data directory
-VOLUME ["${ARTIFACTORY_DATA}"]
+VOLUME ["${ARTIFACTORY_DATA}", "${ARTIFACTORY_DATA}/backup"]
 
 WORKDIR ${ARTIFACTORY_DATA}
 
