@@ -52,7 +52,7 @@ RUN chown -R 1001:0 /entrypoint.sh \
 USER 1001
 
 HEALTHCHECK --interval=5m --timeout=3s \
-  CMD curl -f http://localhost:8080/artifactory || exit 1
+  CMD curl -f http://localhost:8081/artifactory || exit 1
 
 # Expose Artifactories data directory
 VOLUME ["${ARTIFACTORY_DATA}", "${ARTIFACTORY_DATA}/backup"]
