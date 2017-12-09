@@ -37,7 +37,7 @@ RUN set -x \
 && POSTGRESQL_JAR=postgresql-42.1.4.jar \
 && curl -fsSL \
 "https://jdbc.postgresql.org/download/${POSTGRESQL_JAR}" \
--o $ARTIFACTORY_HOME/tomcat/lib/${POSTGRESQL_JAR} \
+-o $TOMCAT_HOME/lib/${POSTGRESQL_JAR} \
 && chown -R 1001:0 ${ARTIFACTORY_HOME} \
 && chmod -R 777 ${ARTIFACTORY_HOME} \
 && chown -R 1001:0 ${ARTIFACTORY_DATA} \

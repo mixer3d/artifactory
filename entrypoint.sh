@@ -78,6 +78,13 @@ setupDataDirs () {
     [ -d ${ARTIFACTORY_DATA}/logs ]   || mkdir -p ${ARTIFACTORY_DATA}/logs   || errorExit "Failed creating $ARTIFACTORY_DATA/logs"
     [ -d ${ARTIFACTORY_DATA}/backup ] || mkdir -p ${ARTIFACTORY_DATA}/backup || errorExit "Failed creating $ARTIFACTORY_DATA/backup"
     [ -d ${ARTIFACTORY_DATA}/access ] || mkdir -p ${ARTIFACTORY_DATA}/access || errorExit "Failed creating $ARTIFACTORY_DATA/access"
+
+#    local TIMEOUT=3000
+ #   local COUNTER=0
+  #  while [ $COUNTER -lt $TIMEOUT ]; do
+   #     sleep 1
+    #    let COUNTER=$COUNTER+1
+    #done
 }
 
 # Wait for DB port to be accessible
@@ -244,6 +251,7 @@ echo "====================================="
 
 checkULimits
 checkMounts
+setupDataDirs
 setDBType
 checkLockFile
 setJvmHeapSize
