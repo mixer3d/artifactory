@@ -55,10 +55,10 @@ HEALTHCHECK --interval=5m --timeout=3s \
   CMD curl -f http://localhost:8081/artifactory || exit 1
 
 # Expose Artifactories data directory
-VOLUME ["${ARTIFACTORY_DATA}", "${ARTIFACTORY_DATA}/backup"]
+VOLUME ["${ARTIFACTORY_DATA}"]
 
 WORKDIR ${ARTIFACTORY_DATA}
 
-EXPOSE 8081
+EXPOSE 8081 8019
 
 ENTRYPOINT ["/entrypoint.sh"]

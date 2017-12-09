@@ -252,7 +252,7 @@ echo "====================================="
 checkULimits
 checkMounts
 setupDataDirs
-setDBType
+#setDBType
 checkLockFile
 setJvmHeapSize
 
