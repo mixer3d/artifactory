@@ -2,7 +2,7 @@ FROM openjdk:8-jdk
 
 MAINTAINER stpork from Mordor team
 
-ENV ARTIFACTORY_VERSION=5.6.2 \
+ENV ARTIFACTORY_VERSION=5.7.2 \
 ARTIFACTORY_HOME=/var/opt/artifactory \
 ARTIFACTORY_DATA=/data/artifactory \
 DB_HOST=postgresql \
