@@ -5,32 +5,36 @@ MAINTAINER stpork from Mordor team
 ENV ARTIFACTORY_VERSION=5.8.0 \
 ARTIFACTORY_HOME=/var/opt/artifactory \
 ARTIFACTORY_DATA=/data/artifactory \
+ARTIFACTORY_URL=http://artifactory:8081/artifactory \
+HAZELCAST_INTERFACE=10.*.*.* \
+HAZELCAST_PORT=10001 \
 DB_HOST=postgresql \
 DB_PORT=5432 \
 DB_USER=artifactory \
-DB_PASSWORD=artifactory-pass \
-DB_NAME=artifactory
+DB_NAME=artifactory \
+DB_PASSWORD=JEurqTbgSUbf7QbTndZ8Ckb1ZyRAociRRGqFHYhzwAuio9bu1LQtniqnQkSNXHsH7i1tGS6
 
 ENV TOMCAT_HOME=${ARTIFACTORY_HOME}/tomcat
 
 RUN set -x \
 && mkdir -p /var/opt  \
 && cd /var/opt \
-&& PACKAGE=jfrog-artifactory-pro-${ARTIFACTORY_VERSION}.zip \
+&& ARTIFACTORY_INSTALL=artifactory-pro-${ARTIFACTORY_VERSION} \
+&& PACKAGE=jfrog-${ARTIFACTORY_INSTALL}.zip \
 && curl -fsSL \
 "https://bintray.com/jfrog/artifactory-pro/download_file?file_path=org/artifactory/pro/jfrog-artifactory-pro/${ARTIFACTORY_VERSION}/${PACKAGE}" \
 -o ${PACKAGE} \
 && unzip -q ${PACKAGE} \
-&& mv artifactory-pro-${ARTIFACTORY_VERSION} ${ARTIFACTORY_HOME} \
+&& mv ${ARTIFACTORY_INSTALL}/etc ${ARTIFACTORY_INSTALL}/etc-clean \
+&& rm -rf ${PACKAGE} ${ARTIFACTORY_INSTALL}/logs \
+&& mv ${ARTIFACTORY_INSTALL} ${ARTIFACTORY_HOME} \
 && find $ARTIFACTORY_HOME -type f -name "*.exe" -o -name "*.bat" | xargs /bin/rm \
-&& rm -rf ${PACKAGE} ${ARTIFACTORY_HOME}/logs \
 && mkdir -p ${ARTIFACTORY_DATA} \
 && ln -s ${ARTIFACTORY_DATA}/access ${ARTIFACTORY_HOME}/access \
 && ln -s ${ARTIFACTORY_DATA}/backup ${ARTIFACTORY_HOME}/backup \
 && ln -s ${ARTIFACTORY_DATA}/data ${ARTIFACTORY_HOME}/data \
 && ln -s ${ARTIFACTORY_DATA}/logs ${ARTIFACTORY_HOME}/logs \
 && ln -s ${ARTIFACTORY_DATA}/run ${ARTIFACTORY_HOME}/run \
-&& mv ${ARTIFACTORY_HOME}/etc ${ARTIFACTORY_HOME}/etc-clean \
 && ln -s ${ARTIFACTORY_DATA}/etc ${ARTIFACTORY_HOME}/etc \
 && sed -i 's/-n "\$ARTIFACTORY_PID"/-d $(dirname "$ARTIFACTORY_PID")/' $ARTIFACTORY_HOME/bin/artifactory.sh \
 && echo 'if [ ! -z "${EXTRA_JAVA_OPTIONS}" ]; then export JAVA_OPTIONS="$JAVA_OPTIONS $EXTRA_JAVA_OPTIONS"; fi' >> $ARTIFACTORY_HOME/bin/artifactory.default \

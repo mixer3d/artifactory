@@ -2,8 +2,6 @@
 #
 # An entrypoint script for Artifactory to allow custom setup before server starts
 #
-ART_ETC=$ARTIFACTORY_DATA/etc
-
 : ${RECOMMENDED_MAX_OPEN_FILES:=32000}
 : ${MIN_MAX_OPEN_FILES:=10000}
 
@@ -71,20 +69,33 @@ checkMounts () {
 # In case data dirs are missing or not mounted, need to create them
 setupDataDirs () {
     logger "Setting up data directories if missing"
-    if [ ! -d ${ARTIFACTORY_DATA}/etc ]; then
-        mv ${ARTIFACTORY_HOME}/etc-clean ${ARTIFACTORY_DATA}/etc || errorExit "Failed creating $ARTIFACTORY_DATA/data"
-    fi
+    [ -d ${ARTIFACTORY_DATA}/etc ]    || mkdir -p ${ARTIFACTORY_DATA}/etc    || errorExit "Failed creating $ARTIFACTORY_DATA/etc"
+    [ "$(ls -A ${ARTIFACTORY_DATA}/etc/)" ] || cp ${ARTIFACTORY_HOME}/etc-clean/* ${ARTIFACTORY_DATA}/etc/
+
     [ -d ${ARTIFACTORY_DATA}/data ]   || mkdir -p ${ARTIFACTORY_DATA}/data   || errorExit "Failed creating $ARTIFACTORY_DATA/data"
     [ -d ${ARTIFACTORY_DATA}/logs ]   || mkdir -p ${ARTIFACTORY_DATA}/logs   || errorExit "Failed creating $ARTIFACTORY_DATA/logs"
     [ -d ${ARTIFACTORY_DATA}/backup ] || mkdir -p ${ARTIFACTORY_DATA}/backup || errorExit "Failed creating $ARTIFACTORY_DATA/backup"
     [ -d ${ARTIFACTORY_DATA}/access ] || mkdir -p ${ARTIFACTORY_DATA}/access || errorExit "Failed creating $ARTIFACTORY_DATA/access"
+}
 
-#    local TIMEOUT=3000
- #   local COUNTER=0
-  #  while [ $COUNTER -lt $TIMEOUT ]; do
-   #     sleep 1
-    #    let COUNTER=$COUNTER+1
-    #done
+setupHANode () {
+    HACONFIG=${ARTIFACTORY_HOME}/ha-node.properties
+    cat <<EOF >> ${HACONFIG}
+node.id=$HOSTNAME
+context.url=${ARTIFACTORY_URL}
+artifactory.ha.data.dir=${ARTIFACTORY_DATA}/ha-data
+artifactory.ha.backup.dir=${ARTIFACTORY_DATA}/ha-backup
+membership.port=$HAZELCAST_PORT
+hazelcast.interface=$HAZELCAST_INTERFACE
+EOF     
+    HAPRIME=${ARTIFACTORY_DATA}/etc/ha-node.properties
+    if [ ! -r ${HAPRIME} ]; then
+        echo primary=true >> ${HACONFIG}
+        mv ${HACONFIG} ${HAPRIME}
+    else
+        echo primary=false >> ${HACONFIG}
+        ln -sf ${HACONFIG} ${HAPRIME}
+    fi
 }
 
 # Wait for DB port to be accessible
@@ -119,10 +130,10 @@ waitForDB () {
 
 # Check DB type configurations before starting Artifactory
 setDBConf () {
-	logger "Generating ${DB_PROPS}"
-  cat <<EOF > ${DB_PROPS}
-type=postgresql
-driver=org.postgresql.Driver
+	logger "Generating $1"
+    cat <<EOF > $1
+type=postgresql                                                                                                                                                   
+driver=org.postgresql.Driver                                                                                                                                      
 url=jdbc:postgresql://$DB_HOST:$DB_PORT/$DB_NAME
 username=$DB_USER
 password=$DB_PASSWORD
@@ -132,7 +143,7 @@ EOF
 # Set and configure DB type
 setDBType () {
 	NEED_COPY=false
-	DB_PROPS=${ART_ETC}/db.properties
+	DB_PROPS=${ARTIFACTORY_DATA}/etc/db.properties
 
 	if ! ls $ARTIFACTORY_HOME/tomcat/lib/postgresql-*.jar 1> /dev/null 2>&1; then
 		errorExit "No postgresql connector found"
@@ -252,7 +263,8 @@ echo "====================================="
 checkULimits
 checkMounts
 setupDataDirs
-#setDBType
+setDBConf ${ARTIFACTORY_DATA}/etc/db.properties
+setupHANode
 checkLockFile
 setJvmHeapSize
 
