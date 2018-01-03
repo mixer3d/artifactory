@@ -80,14 +80,16 @@ setupDataDirs () {
 
 setupHANode () {
     HACONFIG=${ARTIFACTORY_HOME}/ha-node.properties
-    cat <<EOF >> ${HACONFIG}
+
+cat <<EOF > $HACONFIG
 node.id=$HOSTNAME
 context.url=${ARTIFACTORY_URL}
 artifactory.ha.data.dir=${ARTIFACTORY_DATA}/ha-data
 artifactory.ha.backup.dir=${ARTIFACTORY_DATA}/ha-backup
 membership.port=$HAZELCAST_PORT
 hazelcast.interface=$HAZELCAST_INTERFACE
-EOF     
+EOF
+
     HAPRIME=${ARTIFACTORY_DATA}/etc/ha-node.properties
     if [ ! -r ${HAPRIME} ]; then
         echo primary=true >> ${HACONFIG}
