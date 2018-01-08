@@ -2,7 +2,7 @@ FROM openjdk:8-jdk
 
 MAINTAINER stpork from Mordor team
 
-ENV ARTIFACTORY_VERSION=5.8.0 \
+ENV ARTIFACTORY_VERSION=5.8.1 \
 ARTIFACTORY_HOME=/var/opt/artifactory \
 ARTIFACTORY_DATA=/data/artifactory \
 ARTIFACTORY_URL=http://artifactory:8081/artifactory \
